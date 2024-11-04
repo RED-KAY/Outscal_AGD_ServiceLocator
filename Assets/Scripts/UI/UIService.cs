@@ -40,6 +40,22 @@ namespace ServiceLocator.UI
         [SerializeField] private Button playAgainButton;
         [SerializeField] private Button quitButton;
 
+        private static UIService instance;
+        public static UIService Instance { get { return instance; } }
+
+        private void Awake()
+        {
+            if (instance == null)
+            {
+                instance = this;
+            }
+            else
+            {
+                Debug.LogError("Trying to create another" + this.GetType().ToString() + " singleton!");
+                Destroy(this.gameObject);
+            }
+        }
+
 
         private void Start()
         {

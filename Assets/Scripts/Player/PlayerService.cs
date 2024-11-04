@@ -21,7 +21,24 @@ namespace ServiceLocator.Player
         private List<MonkeyController> activeMonkeys;
         private MonkeyView selectedMonkeyView;
         private int health;
+
+        public static PlayerService Instance { get { return instance; } }
+
+        private static PlayerService instance;
+
         public int Money { get; private set; }
+
+        private void Awake()
+        {
+            if (instance == null)
+            {
+                instance = this;
+            }else
+            {
+                Debug.LogError("Trying to create another PlayerService singleton!");
+                Destroy(this.gameObject);
+            }
+        }
 
         private void Start()
         {
