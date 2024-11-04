@@ -15,6 +15,11 @@ namespace ServiceLocator.Player
             rangeTriggerCollider = GetComponent<CircleCollider2D>();
             monkeyAnimator = GetComponent<Animator>();
         }
+
+        private void Update()
+        {
+            controller.UpdateMonkey();
+        }
         public void SetController(MonkeyController controller) => this.controller = controller;
 
         public void SetTriggerRadius(float radiusToSet)
@@ -29,6 +34,18 @@ namespace ServiceLocator.Player
         public void PlayAnimation(MonkeyAnimation animationToPlay) => monkeyAnimator.Play(animationToPlay.ToString(), 0);
 
         public void MakeRangeVisible(bool makeVisible) => RangeSpriteRenderer.color = makeVisible ? new Color(1, 1, 1, 0.25f) : new Color(1, 1, 1, 0);
+
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            if (collision.GetComponent<BloonView>() != null)
+                controller.BloonEnteredRange(collision.GetComponent<BloonView>().Controller);
+        }
+
+        private void OnTriggerExit2D(Collider2D collision)
+        {
+            if (collision.GetComponent<BloonView>() != null)
+                controller.BloonExitedRange(collision.GetComponent<BloonView>().Controller);
+        }
     }
 
     public enum MonkeyAnimation
