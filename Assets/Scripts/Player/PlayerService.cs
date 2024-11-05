@@ -5,10 +5,11 @@ using ServiceLocator.Utilities;
 using ServiceLocator.UI;
 using ServiceLocator.Map;
 using ServiceLocator.Sound;
+using ServiceLocator.Main;
 
 namespace ServiceLocator.Player
 {
-    public class PlayerService : GenericMonoSingleton<PlayerService>
+    public class PlayerService
     {
         [SerializeField] public PlayerScriptableObject playerScriptableObject;
 
@@ -20,8 +21,9 @@ namespace ServiceLocator.Player
         private int money;
         public int Money => money;
 
-        private void Start()
+        public PlayerService(PlayerScriptableObject playerScriptableObject)
         {
+            this.playerScriptableObject = playerScriptableObject;
             projectilePool = new ProjectilePool(playerScriptableObject.ProjectilePrefab, playerScriptableObject.ProjectileScriptableObjects);
             InitializeVariables();
         }
@@ -69,7 +71,7 @@ namespace ServiceLocator.Player
             if (monkeyCost > Money)
                 return;
 
-            MapService.Instance.ValidateSpawnPosition(dropPosition);
+            GameService.Instance.MapService.ValidateSpawnPosition(dropPosition);
         }
 
         public void TrySpawningMonkey(MonkeyType monkeyType, int monkeyCost, Vector3 dropPosition)
@@ -77,10 +79,10 @@ namespace ServiceLocator.Player
             if (monkeyCost > money)
                 return;
 
-            if (MapService.Instance.TryGetMonkeySpawnPosition(dropPosition, out Vector3 spawnPosition))
+            if (GameService.Instance.MapService.TryGetMonkeySpawnPosition(dropPosition, out Vector3 spawnPosition))
             {
                 SpawnMonkey(monkeyType, spawnPosition);
-                SoundService.Instance.PlaySoundEffects(SoundType.SpawnMonkey);
+                GameService.Instance.SoundService.PlaySoundEffects(SoundType.SpawnMonkey);
             }
         }
 
