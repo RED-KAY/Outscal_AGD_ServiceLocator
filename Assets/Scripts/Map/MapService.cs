@@ -3,11 +3,14 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using ServiceLocator.Main;
 using ServiceLocator.Player;
+using ServiceLocator.Events;
 
 namespace ServiceLocator.Map
 {
     public class MapService
     {
+        // Dependencies:
+        private EventService eventService;
         private MapScriptableObject mapScriptableObject;
 
         private Grid currentGrid;
@@ -20,10 +23,15 @@ namespace ServiceLocator.Map
             this.mapScriptableObject = mapScriptableObject;
             tileOverlay = Object.Instantiate(mapScriptableObject.TileOverlay).GetComponent<SpriteRenderer>();
             ResetTileOverlay();
+        }
+
+        public void Init(EventService eventService)
+        {
+            this.eventService = eventService;
             SubscribeToEvents();
         }
 
-        private void SubscribeToEvents() => GameService.Instance.EventService.OnMapSelected.AddListener(LoadMap);
+        private void SubscribeToEvents() => eventService.OnMapSelected.AddListener(LoadMap);
 
         private void LoadMap(int mapId)
         {
@@ -76,13 +84,13 @@ namespace ServiceLocator.Map
         {
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(cursorPosition);
             Vector3Int cellPosition = GetCellPosition(mousePosition);
-            Vector3 centerCell = GetCenterOfCell(cellPosition);
-            
+            Vector3 cellCenter = GetCenterOfCell(cellPosition);
+
             ResetTileOverlay();
 
-            if (CanSpawnOnPosition(centerCell, cellPosition))
+            if (CanSpawnOnPosition(cellCenter, cellPosition))
             {
-                spawnPosition = centerCell;
+                spawnPosition = cellCenter;
                 return true;
             }
             else
@@ -123,9 +131,7 @@ namespace ServiceLocator.Map
             foreach (Collider2D collider in colliders)
             {
                 if (collider.gameObject.GetComponent<MonkeyView>() != null && !collider.isTrigger)
-                {
                     return true;
-                }
             }
             return false;
         }
